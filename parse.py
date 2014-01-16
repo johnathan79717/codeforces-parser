@@ -57,7 +57,7 @@ def generate_tests(folder, num_tests):
             'fi\n')
         for num in xrange(1, num_tests + 1):
             test.write(
-                'rm my_output* a.out\n'
+                'rm -R my_output*\n'
                 'if ! ./a.out < sample_input{0} > my_output{0}; then\n'
                 '    echo Sample test \#{0}: Runtime Error\n'
                 'else\n'
