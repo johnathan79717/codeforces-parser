@@ -52,7 +52,7 @@ def generate_tests(folder, num_tests):
     with open(folder + 'test.sh', 'w') as test:
         test.write(
             '#!/bin/bash\n'
-            'if ! g++ -g main.cc -std=c++11; then\n'
+            'if ! g++ -g main.cc -std=c++0x; then\n'
             '    exit\n'
             'fi\n')
         for num in xrange(1, num_tests + 1):
