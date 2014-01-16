@@ -83,12 +83,13 @@ def main():
         print("USAGE: ./parse.py 379")
         return
     contest = argv[1]
+    template = 'main.cc'
     for problem in ['A', 'B', 'C', 'D', 'E']:
         folder = '%s/%s/' % (contest, problem)
         # print 'Making directory', folder
         call(['mkdir', '-p', folder])
         # print 'Copying main.cc to %s/%s/' % (contest, problem)
-        call(['cp', '-n', 'main.cc', '%s/%s/' % (contest, problem)])
+        call(['cp', '-n', template, '%s/%s/' % (contest, problem)])
         print 'Downloading Problem %s ...' % problem
         html = download(contest, problem)
         num_tests = parse(folder, html)
