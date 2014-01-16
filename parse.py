@@ -49,18 +49,18 @@ def parse(folder, html):
     return parser.num_tests
 
 def generate_tests(folder, num_tests):
-    with open(folder + 'test.fish', 'w') as test:
+    with open(folder + 'test.sh', 'w') as test:
         test.write(
-            '#!/usr/local/bin/fish\n'
-            'if not clang++ -g main.cc -std=c++11\n'
+            '#!/bin/bash\n'
+            'if ! g++ -g main.cc -std=c++11; then\n'
             '    exit\n'
-            'end\n')
+            'fi\n')
         for num in xrange(1, num_tests + 1):
             test.write(
-                'if not ./a.out < sample_input{0} > my_output{0}\n'
+                'if ! ./a.out < sample_input{0} > my_output{0}; then\n'
                 '    echo Sample test \#{0}: Runtime Error\n'
                 'else\n'
-                '    if diff --brief my_output{0} sample_output{0}\n'
+                '    if diff --brief my_output{0} sample_output{0}; then\n'
                 '        echo Sample test \#{0}: Accepted\n'
                 '    else\n'
                 '       echo ========================================\n'
@@ -73,11 +73,10 @@ def generate_tests(folder, num_tests):
                 '       echo My Output \#{0}\n'
                 '       cat my_output{0}\n'
                 '       echo ========================================\n'
-                '    end\n'
-                'end\n'
+                '    fi\n'
+                'fi\n'
                 .format(num))
-    call(['chmod', '+x', folder + 'test.fish'])
-
+    call(['chmod', '+x', folder + 'test.sh'])
 
 def main():
     if(len(argv) < 2):
@@ -86,11 +85,18 @@ def main():
     contest = argv[1]
     for problem in ['A', 'B', 'C', 'D', 'E']:
         folder = '%s/%s/' % (contest, problem)
+        # print 'Making directory', folder
         call(['mkdir', '-p', folder])
-        call(['cp', '-nv', 'main.cc', '%s/%s/' % (contest, problem)])
+        # print 'Copying main.cc to %s/%s/' % (contest, problem)
+        call(['cp', '-n', 'main.cc', '%s/%s/' % (contest, problem)])
+        print 'Downloading Problem %s ...' % problem
         html = download(contest, problem)
         num_tests = parse(folder, html)
+        print num_tests, 'sample test(s) found.'
+        # print 'Generating sample tests ...'
         generate_tests(folder, num_tests)
+        print '========================================'
+    print 'Use ./test.sh to run sample tests in each directory.'
 
 if __name__ == '__main__':
     main()
