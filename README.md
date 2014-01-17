@@ -33,12 +33,18 @@ You can also find this article here, [http://codeforces.com/blog/entry/10416](ht
 + [johnathan79717](http://codeforces.com/profile/johnathan79717)
 + [brunoja](http://codeforces.com/profile/brunoja)
 
+If you have any suggestions and/org bugs send a message!
+
 ##### Versions Changes
 + **1.0:** Initial Version.
 + **1.1:**
-        ++ Cleaner generation of the test script, now it auto detects the test cases, making you able to create your own cases.
-        ++ Echo color output, for accepted we get a green message, otherwise it is red.
-        ++ Added the time measurement for running the test cases.
-        ++ For the runtime error case, it now outputs the input case.
-        ++ Created some constants, such as compile options. These user modifiable constants should be easily spotted at the first lines of the python script.
-        
+Cleaner generation of the test script, now it auto detects the test cases, making you able to create your own cases.
+Echo color output, for accepted we get a green message, otherwise it is red.
+Added the time measurement for running the test cases.
+For the runtime error case, it now outputs the input case.
+Created some constants, such as compile options. These user modifiable constants should be easily spotted at the first lines of the python script.
+
+##### TODO & Bugs:
+
++ Show contest name and problem names while fetching.
++ Parse contest number of problems automatically, right now it is assumed that is a A-E contest only.
