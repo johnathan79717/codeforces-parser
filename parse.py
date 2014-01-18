@@ -3,31 +3,35 @@ from urllib2 import urlopen
 from sys import argv
 from HTMLParser import HTMLParser
 from subprocess import call
+from functools import partial, wraps
+import re
  
 # User modifiable constants:
-COMPILE_CMD='g++ -g main.cc -std=c++0x'
 TEMPLATE='main.cc'
+COMPILE_CMD='g++ -g '+TEMPLATE+' -std=c++0x'
 SAMPLE_INPUT='sample_input'
 SAMPLE_OUTPUT='sample_output'
 MY_OUTPUT='my_output'
 
 # Do not modify these!
-VERSION='CodeForces Parser v1.1'
+VERSION='CodeForces Parser v1.2'
 RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'
 NORM='\033[0m'
 TIME_CMD='/usr/bin/time -o time.out -f "(%es)"'
 TIME_AP='`cat time.out`'
- 
-class CodeforcesParser(HTMLParser):
+
+class CodeforcesProblemParser(HTMLParser):
+
     def __init__(self, folder):
         HTMLParser.__init__(self)
-        self.folder = folder
+	self.folder = folder
         self.num_tests = 0
         self.testcase = None
         self.start_copy = False
- 
+        self.add = ''
+    
     def handle_starttag(self, tag, attrs):
         if tag == 'div':
             if attrs == [('class', 'input')]:
@@ -50,21 +54,72 @@ class CodeforcesParser(HTMLParser):
                 self.testcase.close()
                 self.testcase = None
                 self.start_copy = False
+    
+    def handle_entityref(self, name):
+        if self.start_copy:
+            self.add += self.unescape(('&%s;' % name))
  
     def handle_data(self, data):
         if self.start_copy:
-            self.testcase.write(data)
+            self.testcase.write(self.add+data)
+            self.add = ''
+            
+class CodeforcesContestParser(HTMLParser):
+
+    def __init__(self, contest):
+        HTMLParser.__init__(self)
+        self.contest = contest
+        self.start_contest = False
+        self.start_problem = False
+        self.toggle = False
+        self.name = ''
+        self.problems = []
+        self.problem_names = []
+    
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            if self.name == '' and attrs == [('style', 'color: black'), ('href', '/contest/%s' % (self.contest))]:
+                self.start_contest = True
+            else:
+                regexp = re.compile(r'[.]*/contest/%s/problem/[A-Z]' % self.contest)
+                string = str(attrs[0])
+                search = regexp.search(string)
+                if search is not None:
+                    if self.toggle:
+                        self.toggle = False
+                        self.start_problem = True
+                        self.problems.append(search.group(0).split('/')[-1])
+                    else:
+                        self.toggle = True
  
-def download(contest, problem):
+    def handle_endtag(self, tag):
+        if tag == 'a' and self.start_contest:
+            self.start_contest = False
+        elif self.start_problem:
+            self.start_problem = False
+ 
+    def handle_data(self, data):
+        if self.start_contest:
+            self.name = data
+        elif self.start_problem:
+            self.problem_names.append(data)
+        
+ 
+def parse_problem(folder, contest, problem):
     url = 'http://codeforces.com/contest/%s/problem/%s' % (contest, problem)
-    return urlopen(url).read()
- 
-def parse(folder, html):
-    parser = CodeforcesParser(folder)
+    html = urlopen(url).read()
+    parser = CodeforcesProblemParser(folder)
     parser.feed(html)
     return parser.num_tests
+    
+def parse_contest(contest):
+    url = 'http://codeforces.com/contest/%s' % (contest)
+    html = urlopen(url).read()
+    parser = CodeforcesContestParser(contest)
+    parser.feed(html)
+    return parser
  
-def generate_tests(folder, num_tests):
+def generate_test_script(folder, num_tests):
     with open(folder + 'test.sh', 'w') as test:
         test.write(
             '#!/bin/bash\n'
@@ -109,23 +164,27 @@ def generate_tests(folder, num_tests):
 def main():
     print VERSION
     if(len(argv) < 2):
-        print('USAGE: ./parse.py 379')
+        print('USAGE: ./parse.py 380')
         return
     contest = argv[1]
-    for problem in ['A', 'B', 'C', 'D', 'E']:
+    
+    print 'Parsing contest %s, please wait...' % contest
+    content = parse_contest(contest)
+    print (BOLD+GREEN_F+'*** Round name: '+content.name+' ***'+NORM)
+    print 'Found %d problems!' % (len(content.problems))
+    
+    for index, problem in enumerate(content.problems):
+        print 'Downloading Problem %s: %s...' % (problem, content.problem_names[index])
         folder = '%s/%s/' % (contest, problem)
-        # print 'Making directory', folder
         call(['mkdir', '-p', folder])
-        # print 'Copying main.cc to %s/%s/' % (contest, problem)
-        call(['cp', '-n', TEMPLATE, '%s/%s/' % (contest, problem)])
-        print 'Downloading Problem %s ...' % problem
-        html = download(contest, problem)
-        num_tests = parse(folder, html)
+        call(['cp', '-n', TEMPLATE, '%s/%s/%s.cc' % (contest, problem, problem)])
+        num_tests = parse_problem(folder, contest, problem)
         print num_tests, 'sample test(s) found.'
-        # print 'Generating sample tests ...'
-        generate_tests(folder, num_tests)
+        generate_test_script(folder, num_tests)
         print '========================================'
+        
     print 'Use ./test.sh to run sample tests in each directory.'
  
 if __name__ == '__main__':
     main()
+    
