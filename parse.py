@@ -18,7 +18,7 @@ import re
  
 # User modifiable constants:
 TEMPLATE='main.cc'
-COMPILE_CMD='g++ -g '+TEMPLATE+' -std=c++0x'
+COMPILE_CMD='g++ -g -std=c++0x'
 SAMPLE_INPUT='sample_input'
 SAMPLE_OUTPUT='sample_output'
 MY_OUTPUT='my_output'
@@ -129,16 +129,16 @@ def parse_contest(contest):
     parser.feed(html.decode('utf-8'))
     return parser
  
-def generate_test_script(folder, num_tests):
+def generate_test_script(folder, num_tests, problem):
     with open(folder + 'test.sh', 'w') as test:
         test.write(
-            '#!/bin/bash\n'
-            'if ! '+COMPILE_CMD+'; then\n'
+            ('#!/bin/bash\n'
+            'if ! '+COMPILE_CMD+' {0}.cc; then\n'
             '    exit\n'
             'fi\n'
             'INPUT_NAME='+SAMPLE_INPUT+'\n'
             'OUTPUT_NAME='+SAMPLE_OUTPUT+'\n'
-            'MY_NAME='+MY_OUTPUT+'\n')
+            'MY_NAME='+MY_OUTPUT+'\n').format(problem))
         test.write(
             'for test_file in $INPUT_NAME*\n'
             'do\n'
@@ -190,7 +190,7 @@ def main():
         call(['cp', '-n', TEMPLATE, '%s/%s/%s.cc' % (contest, problem, problem)])
         num_tests = parse_problem(folder, contest, problem)
         print (num_tests, 'sample test(s) found.')
-        generate_test_script(folder, num_tests)
+        generate_test_script(folder, num_tests, problem)
         print ('========================================')
         
     print ('Use ./test.sh to run sample tests in each directory.')

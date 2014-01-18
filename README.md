@@ -13,6 +13,8 @@ You can also find this article here, [http://codeforces.com/blog/entry/10416](ht
 ### Example:
 `./parse.py contest_number (e.g. ./parse.py 380)`
 
+Where `380` is the contest number, not the round number! Check the URL of the contest on your browser, that is the number you are supposed to use.
+
 ### Effect:
 
 ##### What will happen, for example, if `./parse.py 380` is executed?
