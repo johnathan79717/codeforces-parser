@@ -1,7 +1,17 @@
 #!/usr/bin/python
-from urllib2 import urlopen
+
+# Python 2->3 libraries that were renamed.
+try:
+    from urllib2 import urlopen
+except:
+    from urllib.request import urlopen
+try:
+    from HTMLParser import HTMLParser
+except:
+    from html.parser import HTMLParser
+
+# Other libraries.
 from sys import argv
-from HTMLParser import HTMLParser
 from subprocess import call
 from functools import partial, wraps
 import re
@@ -26,7 +36,7 @@ class CodeforcesProblemParser(HTMLParser):
 
     def __init__(self, folder):
         HTMLParser.__init__(self)
-	self.folder = folder
+        self.folder = folder
         self.num_tests = 0
         self.testcase = None
         self.start_copy = False
@@ -109,14 +119,14 @@ def parse_problem(folder, contest, problem):
     url = 'http://codeforces.com/contest/%s/problem/%s' % (contest, problem)
     html = urlopen(url).read()
     parser = CodeforcesProblemParser(folder)
-    parser.feed(html)
+    parser.feed(html.decode('utf-8'))
     return parser.num_tests
     
 def parse_contest(contest):
     url = 'http://codeforces.com/contest/%s' % (contest)
     html = urlopen(url).read()
     parser = CodeforcesContestParser(contest)
-    parser.feed(html)
+    parser.feed(html.decode('utf-8'))
     return parser
  
 def generate_test_script(folder, num_tests):
@@ -162,29 +172,28 @@ def generate_test_script(folder, num_tests):
     call(['chmod', '+x', folder + 'test.sh'])
  
 def main():
-    print VERSION
+    print (VERSION)
     if(len(argv) < 2):
-        print('USAGE: ./parse.py 380')
+        print('USAGE: ./parse.py 379')
         return
     contest = argv[1]
     
-    print 'Parsing contest %s, please wait...' % contest
+    print ('Parsing contest %s, please wait...' % contest)
     content = parse_contest(contest)
     print (BOLD+GREEN_F+'*** Round name: '+content.name+' ***'+NORM)
-    print 'Found %d problems!' % (len(content.problems))
+    print ('Found %d problems!' % (len(content.problems)))
     
     for index, problem in enumerate(content.problems):
-        print 'Downloading Problem %s: %s...' % (problem, content.problem_names[index])
+        print ('Downloading Problem %s: %s...' % (problem, content.problem_names[index]))
         folder = '%s/%s/' % (contest, problem)
         call(['mkdir', '-p', folder])
         call(['cp', '-n', TEMPLATE, '%s/%s/%s.cc' % (contest, problem, problem)])
         num_tests = parse_problem(folder, contest, problem)
-        print num_tests, 'sample test(s) found.'
+        print (num_tests, 'sample test(s) found.')
         generate_test_script(folder, num_tests)
-        print '========================================'
+        print ('========================================')
         
-    print 'Use ./test.sh to run sample tests in each directory.'
+    print ('Use ./test.sh to run sample tests in each directory.')
  
 if __name__ == '__main__':
     main()
-    
