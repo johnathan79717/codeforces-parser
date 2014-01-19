@@ -19,12 +19,12 @@ import re
 # User modifiable constants:
 TEMPLATE='main.cc'
 COMPILE_CMD='g++ -g -std=c++0x'
-SAMPLE_INPUT='sample_input'
-SAMPLE_OUTPUT='sample_output'
+SAMPLE_INPUT='input'
+SAMPLE_OUTPUT='output'
 MY_OUTPUT='my_output'
 
 # Do not modify these!
-VERSION='CodeForces Parser v1.2'
+VERSION='CodeForces Parser v1.3'
 RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'

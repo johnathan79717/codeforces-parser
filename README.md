@@ -1,4 +1,4 @@
-Codeforces Parser v1.2
+Codeforces Parser v1.3
 =================
 
 Summary
@@ -38,6 +38,9 @@ Where `380` is the contest number, not the round number! Check the URL of the co
 If you have any suggestions and/or bugs send a message!
 
 ##### Versions Changes:
++ **1.3:**
+Some minor fixes and code organizing. Also fixed some typos.
+Removed the _sample_ from default input and output files.
 + **1.2:**
 Fixed some typos and constants. 
 Fetching contest info, printing contest name and problem names. 
