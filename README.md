@@ -56,6 +56,7 @@ For the runtime error case, it now outputs the input case.
 Created some constants, such as compile options. These user modifiable constants should be easily spotted at the first lines of the python script.
 + **1.0:** Initial Version.
 
-##### Todo & Bugs:
+##### Todo, Bugs & Troubleshootings:
 
++ In OS X it is necessary to install the `gnu-time` to measure time.
 + This parser currently works only on Unix OSes. If you want to add Windows/Other support let us know.
