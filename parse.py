@@ -29,7 +29,7 @@ RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'
 NORM='\033[0m'
-TIME_CMD='/usr/bin/time -o time.out -f "(%es)"'
+TIME_CMD='`which time` -o time.out -f "(%es)"'
 TIME_AP='`cat time.out`'
 
 class CodeforcesProblemParser(HTMLParser):
@@ -145,7 +145,7 @@ def generate_test_script(folder, num_tests, problem):
             '    i=$((${{#INPUT_NAME}}))\n'
             '    test_case=${{test_file:$i}}\n'
             '    rm -R $MY_NAME*\n'
-            '    if ! /usr/bin/time -o time.out -f "(%es)" ./a.out < $INPUT_NAME$test_case > $MY_NAME$test_case; then\n'
+            '    if ! {5} ./a.out < $INPUT_NAME$test_case > $MY_NAME$test_case; then\n'
             '        echo {1}{4}Sample test \#$test_case: Runtime Error{2} {6}\n'
             '        echo ========================================\n'
             '        echo Sample Input \#$test_case\n'
@@ -189,7 +189,7 @@ def main():
         call(['mkdir', '-p', folder])
         call(['cp', '-n', TEMPLATE, '%s/%s/%s.cc' % (contest, problem, problem)])
         num_tests = parse_problem(folder, contest, problem)
-        print (num_tests, 'sample test(s) found.')
+        print('%d sample test(s) found.' % num_tests)
         generate_test_script(folder, num_tests, problem)
         print ('========================================')
         
