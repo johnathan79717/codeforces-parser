@@ -59,8 +59,11 @@ class CodeforcesProblemParser(HTMLParser):
         if tag == 'br':
             if self.start_copy:
                 self.testcase.write('\n')
+                self.end_line = True
         if tag == 'pre':
             if self.start_copy:
+                if not self.end_line:
+                    self.testcase.write('\n')
                 self.testcase.close()
                 self.testcase = None
                 self.start_copy = False
@@ -73,6 +76,7 @@ class CodeforcesProblemParser(HTMLParser):
         if self.start_copy:
             self.testcase.write(self.add+data)
             self.add = ''
+            self.end_line = False
             
 class CodeforcesContestParser(HTMLParser):
 
