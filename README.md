@@ -1,4 +1,4 @@
-Codeforces Parser v1.3
+Codeforces Parser v1.4
 =================
 
 Summary
@@ -11,22 +11,22 @@ This is a python program that parses the sample tests from the contest problem p
 You can also find this article here, [http://codeforces.com/blog/entry/10416](http://codeforces.com/blog/entry/10416)
 
 ### Example:
-`./parse.py contest_number (e.g. ./parse.py 380)`
+`./parse.py contest_number (e.g. ./parse.py 435)`
 
-Where `380` is the contest number, not the round number! Check the URL of the contest on your browser, that is the number you are supposed to use.
+Where `435` is the contest number, not the round number! Check the URL of the contest on your browser, that is the number you are supposed to use.
 
 ### Effect:
 
 ##### What will happen, for example, if `./parse.py 380` is executed?
 
-1. Directories `380/A`, `380/B`, `380/C`, `380/D` and so on are created depending on the contest number of problems.
-2. For each problem, `main.cc` is copied and renamed to the problem letter to the corresponding directory. **You can put the path of your usual template in `parse.py:9`**.
+1. Directories `435/A`, `435/B`, `435/C`, `435/D` and so on are created depending on the contest number of problems.
+2. For each problem, `main.cc` is copied and renamed to the problem letter to the corresponding directory. **You can put the path of your usual template in `parse.py:20`**.
 3. Problem page is downloaded from Codeforces website, and parsed. Sample input/output files are generated, e.g. `sample_input1`, `sample_output1`, `sample_input2`, `sample_output2` and so on. You can create your own test cases after that, just keep the same naming format as others test cases.
 4. A script `test.sh` is generated. You can use it to compile and run the sample tests after you finish coding. Just run `./test.sh` in the problem directory.
 
 ##### What will happen if `./test.sh` is executed?
 
-1. Compilation: `g++ -g main.cc -std=c++0x`. **You can change the compile options in `parse.py:8`**.
+1. Compilation: `g++ -g main.cc -std=c++0x`. **You can change the compile options in `parse.py:21`**.
 2. Run each sample tests on your program (`a.out`), and check the output by `diff`. If it's correct, print **Accepted**, or else print the sample test that went wrong.
 
 ### Collaborators and Versions:
@@ -38,6 +38,11 @@ Where `380` is the contest number, not the round number! Check the URL of the co
 If you have any suggestions and/or bugs send a message!
 
 ##### Versions Changes:
++ **1.4:**
+Changed how the parser gets the problems. During the competitions the page is slightly different.
+Fixed some invalid character on input and output causing the script to crash.
+Forcing a new line on the input/output if there is none.
+Fixed some line number information in this README file.
 + **1.3:**
 Some minor fixes and code organizing. Also fixed some typos.
 Removed the _sample_ from default input and output files.
