@@ -18,13 +18,13 @@ import re
  
 # User modifiable constants:
 TEMPLATE='main.cc'
-COMPILE_CMD='g++ -g -std=c++0x'
+COMPILE_CMD='g++ -g -std=c++0x -Wall'
 SAMPLE_INPUT='input'
 SAMPLE_OUTPUT='output'
 MY_OUTPUT='my_output'
 
 # Do not modify these!
-VERSION='CodeForces Parser v1.4'
+VERSION='CodeForces Parser v1.4.1: https://github.com/johnathan79717/codeforces-parser'
 RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'
@@ -41,7 +41,6 @@ class CodeforcesProblemParser(HTMLParser):
         self.num_tests = 0
         self.testcase = None
         self.start_copy = False
-        self.add = ''
     
     def handle_starttag(self, tag, attrs):
         if tag == 'div':
@@ -71,12 +70,11 @@ class CodeforcesProblemParser(HTMLParser):
     
     def handle_entityref(self, name):
         if self.start_copy:
-            self.add += self.unescape(('&%s;' % name))
+            self.testcase.write(self.unescape(('&%s;' % name)))
  
     def handle_data(self, data):
         if self.start_copy:
-            self.testcase.write(self.add+data)
-            self.add = ''
+            self.testcase.write(data)
             self.end_line = False
 
 # Contest parser.  
