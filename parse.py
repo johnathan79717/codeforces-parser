@@ -18,7 +18,7 @@ import re
  
 # User modifiable constants:
 TEMPLATE='main.cc'
-COMPILE_CMD='g++ -g -std=c++0x -Wall'
+COMPILE_CMD='g++ -g -std=c++0x -Wall $DBG'
 SAMPLE_INPUT='input'
 SAMPLE_OUTPUT='output'
 MY_OUTPUT='my_output'
@@ -134,6 +134,19 @@ def generate_test_script(folder, num_tests, problem):
     with open(folder + 'test.sh', 'w') as test:
         test.write(
             ('#!/bin/bash\n'
+            'DBG=""\n'
+            'while getopts ":d" opt; do\n'
+            '  case $opt in\n'
+            '    d)\n'
+            '      echo "-d was selected; compiling in DEBUG mode!" >&2\n'
+            '      DBG="-DDEBUG"\n'
+            '      ;;\n'
+            '    \?)\n'
+            '      echo "Invalid option: -$OPTARG" >&2\n'
+            '      ;;\n'
+            '  esac\n'
+            'done\n'
+            '\n'
             'if ! '+COMPILE_CMD+' {0}.cc; then\n'
             '    exit\n'
             'fi\n'
