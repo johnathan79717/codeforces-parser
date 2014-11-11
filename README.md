@@ -26,7 +26,7 @@ Where `464` is the contest number, not the round number! Check the URL of the co
 
 ##### What will happen if `./test.sh` is executed?
 
-1. Compilation: `g++ -g -std=c++0x -Wall main.cc`. **You can change the compile options in `parse.py:21`**.
+1. Compilation: `g++ -g -std=c++0x -Wall $DBG main.cc`. **You can change the compile options in `parse.py:21`**. Variable $DBG is set to -DDEBUG if you start "./test.sh -d", otherwise it is empty. This allows for compilation with and without debug macros.
 2. Run each sample tests on your program (`a.out`), and check the output by `diff`. If it's correct, print **Accepted**, or else print the sample test that went wrong.
 
 ### Collaborators and Versions:
@@ -34,7 +34,7 @@ Where `464` is the contest number, not the round number! Check the URL of the co
 ##### List of CodeForces Collaborators:
 + [johnathan79717](http://codeforces.com/profile/johnathan79717)
 + [brunoja](http://codeforces.com/profile/brunoja)
-
++ [Matthias Kauer (mini addition)]
 If you have any suggestions and/or bugs drop a message!
 
 ##### Versions Changes:
