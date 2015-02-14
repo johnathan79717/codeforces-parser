@@ -38,6 +38,9 @@ Where `464` is the contest number, not the round number! Check the URL of the co
 If you have any suggestions and/or bugs drop a message!
 
 ##### Versions Changes:
++ **1.5:**
+Added debug flag (-d) to enable DEBUG macro (read above for details).
+Fixed problems parsing for problem names that are not called A, B, etc. Such as A1, A2..
 + **1.4.1:**
 Minor fixes, such as typos, bugs and special characters handling.
 + **1.4:**
