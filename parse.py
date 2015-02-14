@@ -86,6 +86,7 @@ class CodeforcesContestParser(HTMLParser):
         self.start_contest = False
         self.start_problem = False
         self.name = ''
+        self.problem_name = ''
         self.problems = []
         self.problem_names = []
     
@@ -105,13 +106,15 @@ class CodeforcesContestParser(HTMLParser):
         if tag == 'a' and self.start_contest:
             self.start_contest = False
         elif self.start_problem:
+            self.problem_names.append(self.problem_name)
+            self.problem_name = ''
             self.start_problem = False
  
     def handle_data(self, data):
         if self.start_contest:
             self.name = data
         elif self.start_problem:
-            self.problem_names.append(data)
+            self.problem_name += data
         
 # Parses each problem page.
 def parse_problem(folder, contest, problem):
@@ -190,7 +193,7 @@ def generate_test_script(folder, num_tests, problem):
 def main():
     print (VERSION)
     if(len(argv) < 2):
-        print('USAGE: ./parse.py 435')
+        print('USAGE: ./parse.py 512')
         return
     contest = argv[1]
     
