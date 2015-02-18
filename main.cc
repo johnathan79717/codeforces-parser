@@ -34,6 +34,11 @@
 #define RS(x) scanf("%s",x)
 #define PI(x) printf("%d\n",x)
 #define PIS(x) printf("%d ",x)
+#ifdef ONLINE_JUDGE
+    #define PL(x) printf("%I64d\n",x);
+#else
+    #define PL(x) printf("%lld\n",x)
+#endif
 #define MP make_pair
 #define PB push_back
 #define EB emplace_back
