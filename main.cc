@@ -12,6 +12,7 @@
 #include <set>
 #include <unordered_set>
 #include <unordered_map>
+#include <cassert>
 #include <deque>
 #include <stack>
 #include <functional>
@@ -25,12 +26,12 @@
 #define REPL(i,x) for(int i=0;x[i];i++)
 #define PER(i,n) for(int i=(n)-1;i>=0;i--)
 #define PER1(i,a,b) for(int i=(a);i>=(b);i--)
-#define RI(x) scanf("%d",&x)
-#define DRI(x) int x;RI(x)
-#define RII(x,y) scanf("%d%d",&x,&y)
-#define DRII(x,y) int x,y;RII(x,y)
-#define RIII(x,y,z) scanf("%d%d%d",&x,&y,&z)
-#define DRIII(x,y,z) int x,y,z;RIII(x,y,z)
+#define GET_4TH(_1, _2, _3, NAME, ...) NAME
+#define RI(argv...) GET_4TH(argv, RI3, RI2, RI1)(argv)
+#define RI1(x) scanf("%d",&x)
+#define RI2(x,y) RI1(x), RI1(y)
+#define RI3(x,y,z) RI1(x), RI2(y, z)
+#define DRI(argv...) int argv;RI(argv)
 #define RS(x) scanf("%s",x)
 #define PI(x) printf("%d\n",x)
 #define PIS(x) printf("%d ",x)
@@ -49,6 +50,7 @@
 #define MS1(x) memset(x,-1,sizeof(x))
 #define SEP(x) ((x)?'\n':' ')
 #define V(x) vector<x>
+#define DRA(A, N) VI A(N); REP(i, N) RI(A[i])
 using namespace std;
 typedef pair<int,int> PII;
 typedef vector<int> VI;
