@@ -16,6 +16,10 @@
 #include <deque>
 #include <stack>
 #include <functional>
+#define X first
+#define Y second
+#define MAX(x, a) x = max(x, a)
+#define MIN(x, a) x = min(x, a)
 #define CASET int ___T, case_n = 1; scanf("%d ", &___T); while (___T-- > 0)
 #define SZ(X) ((int)(X).size())
 #define LEN(X) strlen(X)
@@ -26,19 +30,25 @@
 #define REPL(i,x) for(int i=0;x[i];i++)
 #define PER(i,n) for(int i=(n)-1;i>=0;i--)
 #define PER1(i,a,b) for(int i=(a);i>=(b);i--)
-#define GET_4TH(_1, _2, _3, NAME, ...) NAME
-#define RI(argv...) GET_4TH(argv, RI3, RI2, RI1)(argv)
 #define RI1(x) scanf("%d",&x)
 #define RI2(x,y) RI1(x), RI1(y)
-#define RI3(x,y,z) RI1(x), RI2(y, z)
+#define RI3(x,y...) RI1(x), RI2(y)
+#define RI4(x,y...) RI1(x), RI3(y)
+#define RI5(x,y...) RI1(x), RI4(y)
+#define RI6(x,y...) RI1(x), RI5(y)
+#define GET_MACRO(_1, _2, _3, _4, _5, _6, NAME, ...) NAME
+#define RI(argv...) GET_MACRO(argv, RI6, RI5, RI4, RI3, RI2, RI1)(argv)
 #define DRI(argv...) int argv;RI(argv)
 #define RS(x) scanf("%s",x)
 #define PI(x) printf("%d\n",x)
 #define PIS(x) printf("%d ",x)
+#define DRL(x) LL x; RL(x)
 #ifdef ONLINE_JUDGE
-    #define PL(x) printf("%I64d\n",x);
+    #define PL(x) printf("%I64d\n",x)
+    #define RL(x) scanf("%I64d\n",&x)
 #else
     #define PL(x) printf("%lld\n",x)
+    #define RL(x) scanf("%lld\n",&x)
 #endif
 #define MP make_pair
 #define PB push_back
