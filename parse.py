@@ -208,7 +208,7 @@ def main():
         print ('Downloading Problem %s: %s...' % (problem, content.problem_names[index]))
         folder = '%s/%s/' % (contest, problem)
         call(['mkdir', '-p', folder])
-        call(['cp', '-n', TEMPLATE, '%s/%s/%s.cc' % (contest, problem, problem)])
+        call(['cp', '-n', TEMPLATE, '%s/%s/%s.%s' % (contest, problem, problem, TEMPLATE.split('.')[1])])
         num_tests = parse_problem(folder, contest, problem)
         print('%d sample test(s) found.' % num_tests)
         generate_test_script(folder, num_tests, problem)
