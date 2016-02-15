@@ -1,4 +1,4 @@
-Codeforces Parser v1.5
+Codeforces Parser v1.5.1
 =================
 
 Summary
@@ -39,6 +39,8 @@ Where `512` is the contest number, not the round number! Check the URL of the co
 If you have any suggestions and/or bugs drop a message!
 
 ##### Versions Changes:
++ **1.5.1:**
+Minor bug fixes related to Python 2 vs Python 3.
 + **1.5:**
 Added debug flag (-d) to enable DEBUG macro (read above for details).
 Fixed problems parsing for problem names that are not called A, B, etc. Such as A1, A2..
