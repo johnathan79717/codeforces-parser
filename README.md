@@ -41,6 +41,7 @@ If you have any suggestions and/or bugs drop a message!
 ##### Versions Changes:
 + **1.5.1:**
 Minor bug fixes related to Python 2 vs Python 3.
+Makes the template file to use the proper language extension.
 + **1.5:**
 Added debug flag (-d) to enable DEBUG macro (read above for details).
 Fixed problems parsing for problem names that are not called A, B, etc. Such as A1, A2..
