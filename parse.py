@@ -47,10 +47,10 @@ class CodeforcesProblemParser(HTMLParser):
             if attrs == [('class', 'input')]:
                 self.num_tests += 1
                 self.testcase = open(
-                    '%s/%s%d' % (self.folder, SAMPLE_INPUT, self.num_tests), 'w')
+                    '%s/%s%d' % (self.folder, SAMPLE_INPUT, self.num_tests), 'wb')
             elif attrs == [('class', 'output')]:
                 self.testcase = open(
-                    '%s/%s%d' % (self.folder, SAMPLE_OUTPUT, self.num_tests), 'w')
+                    '%s/%s%d' % (self.folder, SAMPLE_OUTPUT, self.num_tests), 'wb')
         elif tag == 'pre':
             if self.testcase != None:
                 self.start_copy = True
@@ -58,23 +58,23 @@ class CodeforcesProblemParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag == 'br':
             if self.start_copy:
-                self.testcase.write('\n')
+                self.testcase.write('\n'.encode('utf-8'))
                 self.end_line = True
         if tag == 'pre':
             if self.start_copy:
                 if not self.end_line:
-                    self.testcase.write('\n')
+                    self.testcase.write('\n'.encode('utf-8'))
                 self.testcase.close()
                 self.testcase = None
                 self.start_copy = False
     
     def handle_entityref(self, name):
         if self.start_copy:
-            self.testcase.write(self.unescape(('&%s;' % name)))
+            self.testcase.write(self.unescape(('&%s;' % name)).encode('utf-8'))
  
     def handle_data(self, data):
         if self.start_copy:
-            self.testcase.write(data)
+            self.testcase.write(data.encode('utf-8'))
             self.end_line = False
 
 # Contest parser.  
@@ -218,4 +218,3 @@ def main():
  
 if __name__ == '__main__':
     main()
-    
