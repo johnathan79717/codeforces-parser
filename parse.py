@@ -24,7 +24,7 @@ SAMPLE_OUTPUT='output'
 MY_OUTPUT='my_output'
 
 # Do not modify these!
-VERSION='CodeForces Parser v1.5: https://github.com/johnathan79717/codeforces-parser'
+VERSION='CodeForces Parser v1.5.1: https://github.com/johnathan79717/codeforces-parser'
 RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'
@@ -95,7 +95,7 @@ class CodeforcesContestParser(HTMLParser):
                 self.start_contest = True
         elif tag == 'option':
             if len(attrs) == 1:
-                regexp = re.compile(r"u'[A-Z].*'")
+                regexp = re.compile(r"'[A-Z]'") # The attrs will be something like: ('value', 'X')
                 string = str(attrs[0])
                 search = regexp.search(string)
                 if search is not None:
