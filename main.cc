@@ -20,7 +20,7 @@
 #define Y second
 #define MAX(x, a) x = max(x, a)
 #define MIN(x, a) x = min(x, a)
-#define CASET int ___T, case_n = 1; scanf("%d ", &___T); while (___T-- > 0)
+#define CASET int ___T; scanf("%d ", &___T); while (___T-- > 0)
 #define SZ(X) ((int)(X).size())
 #define LEN(X) strlen(X)
 #define FOR(i,c) for(auto &i: c)
@@ -59,13 +59,14 @@
 #define MS0(x) memset(x,0,sizeof(x))
 #define MS1(x) memset(x,-1,sizeof(x))
 #define SEP(x) ((x)?'\n':' ')
-#define V(x) vector<x>
 #define DRA(A, N) VI A(N); REP(i, N) RI(A[i])
 using namespace std;
 typedef pair<int,int> PII;
 typedef vector<int> VI;
 typedef long long LL;
 const int INF = 1000000000;
+template<typename T>
+using V = std::vector<T>;
 
 #ifdef DEBUG
      #define debug(args...)            {dbg,args; cerr<<endl;}
