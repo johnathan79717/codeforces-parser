@@ -156,13 +156,13 @@ def generate_test_script(folder, num_tests, problem):
             'fi\n'
             'INPUT_NAME='+SAMPLE_INPUT+'\n'
             'OUTPUT_NAME='+SAMPLE_OUTPUT+'\n'
-            'MY_NAME='+MY_OUTPUT+'\n').format(problem))
+            'MY_NAME='+MY_OUTPUT+'\n'
+            'rm -R $MY_NAME* &>/dev/null\n').format(problem))
         test.write(
             'for test_file in $INPUT_NAME*\n'
             'do\n'
             '    i=$((${{#INPUT_NAME}}))\n'
             '    test_case=${{test_file:$i}}\n'
-            '    rm -R $MY_NAME*\n'
             '    if ! {5} ./a.out < $INPUT_NAME$test_case > $MY_NAME$test_case; then\n'
             '        echo {1}{4}Sample test \#$test_case: Runtime Error{2} {6}\n'
             '        echo ========================================\n'
