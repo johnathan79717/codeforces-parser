@@ -151,13 +151,13 @@ def generate_test_script(folder, num_tests, problem):
             '  esac\n'
             'done\n'
             '\n'
-            'if ! '+COMPILE_CMD+' {0}.cc; then\n'
+            'if ! '+COMPILE_CMD+' {0}.{1}; then\n'
             '    exit\n'
             'fi\n'
             'INPUT_NAME='+SAMPLE_INPUT+'\n'
             'OUTPUT_NAME='+SAMPLE_OUTPUT+'\n'
             'MY_NAME='+MY_OUTPUT+'\n'
-            'rm -R $MY_NAME* &>/dev/null\n').format(problem))
+            'rm -R $MY_NAME* &>/dev/null\n').format(problem, TEMPLATE.split('.')[1]))
         test.write(
             'for test_file in $INPUT_NAME*\n'
             'do\n'
