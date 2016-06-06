@@ -24,7 +24,7 @@ SAMPLE_OUTPUT='output'
 MY_OUTPUT='my_output'
 
 # Do not modify these!
-VERSION='CodeForces Parser v1.4.1: https://github.com/johnathan79717/codeforces-parser'
+VERSION='CodeForces Parser v1.5.1: https://github.com/johnathan79717/codeforces-parser'
 RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'
@@ -47,10 +47,10 @@ class CodeforcesProblemParser(HTMLParser):
             if attrs == [('class', 'input')]:
                 self.num_tests += 1
                 self.testcase = open(
-                    '%s/%s%d' % (self.folder, SAMPLE_INPUT, self.num_tests), 'w')
+                    '%s/%s%d' % (self.folder, SAMPLE_INPUT, self.num_tests), 'wb')
             elif attrs == [('class', 'output')]:
                 self.testcase = open(
-                    '%s/%s%d' % (self.folder, SAMPLE_OUTPUT, self.num_tests), 'w')
+                    '%s/%s%d' % (self.folder, SAMPLE_OUTPUT, self.num_tests), 'wb')
         elif tag == 'pre':
             if self.testcase != None:
                 self.start_copy = True
@@ -58,23 +58,23 @@ class CodeforcesProblemParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag == 'br':
             if self.start_copy:
-                self.testcase.write('\n')
+                self.testcase.write('\n'.encode('utf-8'))
                 self.end_line = True
         if tag == 'pre':
             if self.start_copy:
                 if not self.end_line:
-                    self.testcase.write('\n')
+                    self.testcase.write('\n'.encode('utf-8'))
                 self.testcase.close()
                 self.testcase = None
                 self.start_copy = False
     
     def handle_entityref(self, name):
         if self.start_copy:
-            self.testcase.write(self.unescape(('&%s;' % name)))
+            self.testcase.write(self.unescape(('&%s;' % name)).encode('utf-8'))
  
     def handle_data(self, data):
         if self.start_copy:
-            self.testcase.write(data)
+            self.testcase.write(data.encode('utf-8'))
             self.end_line = False
 
 # Contest parser.  
@@ -86,6 +86,7 @@ class CodeforcesContestParser(HTMLParser):
         self.start_contest = False
         self.start_problem = False
         self.name = ''
+        self.problem_name = ''
         self.problems = []
         self.problem_names = []
     
@@ -94,7 +95,7 @@ class CodeforcesContestParser(HTMLParser):
                 self.start_contest = True
         elif tag == 'option':
             if len(attrs) == 1:
-                regexp = re.compile(r"u'[A-Z]'")
+                regexp = re.compile(r"'[A-Z]'") # The attrs will be something like: ('value', 'X')
                 string = str(attrs[0])
                 search = regexp.search(string)
                 if search is not None:
@@ -105,20 +106,23 @@ class CodeforcesContestParser(HTMLParser):
         if tag == 'a' and self.start_contest:
             self.start_contest = False
         elif self.start_problem:
+            self.problem_names.append(self.problem_name)
+            self.problem_name = ''
             self.start_problem = False
  
     def handle_data(self, data):
         if self.start_contest:
             self.name = data
         elif self.start_problem:
-            self.problem_names.append(data)
+            self.problem_name += data
         
 # Parses each problem page.
 def parse_problem(folder, contest, problem):
     url = 'http://codeforces.com/contest/%s/problem/%s' % (contest, problem)
     html = urlopen(url).read()
     parser = CodeforcesProblemParser(folder)
-    parser.feed(html.decode('utf-8').encode('utf-8')) # Should fix special chars problems.
+    parser.feed(html.decode('utf-8')) 
+    # .encode('utf-8') Should fix special chars problems?
     return parser.num_tests
 
 # Parses the contest page.  
@@ -147,25 +151,25 @@ def generate_test_script(folder, num_tests, problem):
             '  esac\n'
             'done\n'
             '\n'
-            'if ! '+COMPILE_CMD+' {0}.cc; then\n'
+            'if ! '+COMPILE_CMD+' {0}.{1}; then\n'
             '    exit\n'
             'fi\n'
             'INPUT_NAME='+SAMPLE_INPUT+'\n'
             'OUTPUT_NAME='+SAMPLE_OUTPUT+'\n'
-            'MY_NAME='+MY_OUTPUT+'\n').format(problem))
+            'MY_NAME='+MY_OUTPUT+'\n'
+            'rm -R $MY_NAME* &>/dev/null\n').format(problem, TEMPLATE.split('.')[1]))
         test.write(
             'for test_file in $INPUT_NAME*\n'
             'do\n'
             '    i=$((${{#INPUT_NAME}}))\n'
             '    test_case=${{test_file:$i}}\n'
-            '    rm -R $MY_NAME*\n'
             '    if ! {5} ./a.out < $INPUT_NAME$test_case > $MY_NAME$test_case; then\n'
             '        echo {1}{4}Sample test \#$test_case: Runtime Error{2} {6}\n'
             '        echo ========================================\n'
             '        echo Sample Input \#$test_case\n'
             '        cat $INPUT_NAME$test_case\n'
             '    else\n'
-            '        if diff --brief $MY_NAME$test_case $OUTPUT_NAME$test_case; then\n'
+            '        if diff --brief --ignore-trailing-space $MY_NAME$test_case $OUTPUT_NAME$test_case; then\n'
             '            echo {1}{3}Sample test \#$test_case: Accepted{2} {6}\n'
             '        else\n'
             '            echo {1}{4}Sample test \#$test_case: Wrong Answer{2} {6}\n'
@@ -189,7 +193,7 @@ def generate_test_script(folder, num_tests, problem):
 def main():
     print (VERSION)
     if(len(argv) < 2):
-        print('USAGE: ./parse.py 435')
+        print('USAGE: ./parse.py 512')
         return
     contest = argv[1]
     
@@ -204,7 +208,7 @@ def main():
         print ('Downloading Problem %s: %s...' % (problem, content.problem_names[index]))
         folder = '%s/%s/' % (contest, problem)
         call(['mkdir', '-p', folder])
-        call(['cp', '-n', TEMPLATE, '%s/%s/%s.cc' % (contest, problem, problem)])
+        call(['cp', '-n', TEMPLATE, '%s/%s/%s.%s' % (contest, problem, problem, TEMPLATE.split('.')[1])])
         num_tests = parse_problem(folder, contest, problem)
         print('%d sample test(s) found.' % num_tests)
         generate_test_script(folder, num_tests, problem)
@@ -214,4 +218,3 @@ def main():
  
 if __name__ == '__main__':
     main()
-    
