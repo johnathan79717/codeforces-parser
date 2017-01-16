@@ -18,7 +18,7 @@ import re
  
 # User modifiable constants:
 TEMPLATE='main.cc'
-COMPILE_CMD='g++ -g -std=c++0x -Wall $DBG'
+COMPILE_CMD='g++ -g -std=c++11 -Wall'
 SAMPLE_INPUT='input'
 SAMPLE_OUTPUT='output'
 MY_OUTPUT='my_output'
@@ -29,7 +29,7 @@ RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'
 NORM='\033[0m'
-TIME_CMD='`which time` -o time.out -f "(%es)"'
+TIME_CMD='`which gtime` -o time.out -f "(%es)"'
 TIME_AP='`cat time.out`'
 
 # Problems parser.
@@ -169,7 +169,7 @@ def generate_test_script(folder, num_tests, problem):
             '        echo Sample Input \#$test_case\n'
             '        cat $INPUT_NAME$test_case\n'
             '    else\n'
-            '        if diff --brief --ignore-trailing-space $MY_NAME$test_case $OUTPUT_NAME$test_case; then\n'
+            '        if diff --brief --strip-trailing-cr $MY_NAME$test_case $OUTPUT_NAME$test_case; then\n'
             '            echo {1}{3}Sample test \#$test_case: Accepted{2} {6}\n'
             '        else\n'
             '            echo {1}{4}Sample test \#$test_case: Wrong Answer{2} {6}\n'
