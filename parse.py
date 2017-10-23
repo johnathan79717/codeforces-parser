@@ -32,7 +32,13 @@ language_params = {
             'COMPILE_CMD' : 'go build $DBG -o a.out',
             'DEBUG_FLAGS' : '''"-ldflags '-X=main.DEBUG=Y'"''',
             'RUN_CMD'     : './a.out'
-            }
+            },
+        'kotlin'    : {
+            'TEMPLATE'    : 'main.kt',
+            'COMPILE_CMD' : 'kotlinc -include-runtime -d out.jar',
+            'DEBUG_FLAGS' : "-d",
+            'RUN_CMD'     : 'java -jar out.jar $DBG'
+            },
         }
 
 SAMPLE_INPUT='input'
