@@ -14,8 +14,10 @@ except:
 from sys import argv
 from subprocess import call
 from functools import partial, wraps
+
 import re
 import argparse
+import platform
 
 ###########################
 # User modifiable constants
@@ -51,7 +53,10 @@ RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'
 NORM='\033[0m'
-TIME_CMD='`which time` -o time.out -f "(%es)"'
+if (platform.system() == "Darwin"):
+    TIME_CMD='`which gtime` -o time.out -f "(%es)"'
+else:
+    TIME_CMD='`which time` -o time.out -f "(%es)"'
 TIME_AP='`cat time.out`'
 
 # Problems parser.
