@@ -10,6 +10,10 @@ This is a python program that parses the sample tests from the contest problem p
 
 You can also find this article here, [http://codeforces.com/blog/entry/10416](http://codeforces.com/blog/entry/10416)
 
+### Installation
+
+ * Arch Linux (AUR): https://aur.archlinux.org/packages/codeforces-parser-git/ (note that parse.py is renamed codeforces-parser)
+
 ### Example:
 `./parse.py contest_number (e.g. ./parse.py 513)`
 
