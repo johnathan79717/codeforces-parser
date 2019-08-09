@@ -117,7 +117,7 @@ class CodeforcesContestParser(HTMLParser):
                 self.start_contest = True
         elif tag == 'option':
             if len(attrs) == 1:
-                regexp = re.compile(r"'[A-Z]'") # The attrs will be something like: ('value', 'X')
+                regexp = re.compile(r"'[A-Z][0-9]{0,1}'") # The attrs will be something like: ('value', 'X')
                 string = str(attrs[0])
                 search = regexp.search(string)
                 if search is not None:
