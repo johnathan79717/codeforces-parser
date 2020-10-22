@@ -1,0 +1,108 @@
+#include<bits/stdc++.h>
+using namespace std;
+class Node{
+	public:
+	int data;
+	Node* next;
+};
+Node* start=NULL;
+int insertfront(int n)
+{
+  Node* temp=new Node();
+  if(start==NULL)
+  {
+  	start=temp;
+  	temp->data=n;
+  	temp->next=NULL;
+  }else
+  {
+  	temp->next=start;
+  	start=temp;
+  	temp->data=n;
+  }
+}
+int insertlast(int m)
+{
+	Node* p=new Node();
+	 p->data=m;
+	 p->next=NULL;
+	 Node* ptr=start;
+	 while(ptr->next!=NULL)
+	 {
+	 	ptr=ptr->next;
+	 }
+	 ptr->next=p;
+}
+int fir_delete()
+{
+	if(start==NULL)
+	{
+		cout<<"link list is empty"<<endl;
+	}else
+	{
+		Node* temp=start;
+		start=start->next;
+		delete(temp);
+	}
+}
+int last_delete()
+{
+	Node* current=start;
+	Node* previous=start;
+	while(current->next!=NULL)
+	{
+		previous=current;
+		current=current->next;
+	}
+	previous->next=NULL;
+	delete(current);
+}
+int nth_delete()
+{
+	Node* current=start;
+	Node* previous=start;
+	int n;
+	cin>>n;
+	if(n==1)
+	{
+		start=start->next;
+		delete(current);
+	}else
+	{
+		for(int i=1; i<n; i++)
+		{
+			previous=current;
+			current=current->next;
+			
+		}
+		previous->next=current->next;
+		delete(current);
+	}
+}
+int print()
+{
+	Node* ptr=start;
+	while(ptr!=NULL)
+	{
+		cout<<ptr->data<<" ";
+		ptr=ptr->next;
+	}
+}
+int main()
+{
+	insertfront(25);
+	insertfront(36);
+	insertfront(50);
+	insertlast(100);
+	insertlast(200);
+	print();
+	cout<<endl;
+fir_delete();
+	print();
+	cout<<endl;
+	last_delete();
+	print();
+	cout<<endl;
+	nth_delete();
+	print();
+}
