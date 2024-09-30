@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # Python 2->3 libraries that were renamed.
 try:
@@ -9,6 +9,7 @@ try:
     from HTMLParser import HTMLParser
 except:
     from html.parser import HTMLParser
+from urllib.request import Request
 
 # Other libraries.
 from sys import argv
@@ -144,18 +145,21 @@ class CodeforcesContestParser(HTMLParser):
             self.problem_name += data
 
 # Parses each problem page.
+from urllib.request import Request
+
 def parse_problem(folder, contest, problem):
     url = 'http://codeforces.com/contest/%s/problem/%s' % (contest, problem)
-    html = urlopen(url).read()
+    req = Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'})
+    html = urlopen(req).read()
     parser = CodeforcesProblemParser(folder)
     parser.feed(html.decode('utf-8'))
-    # .encode('utf-8') Should fix special chars problems?
     return parser.num_tests
 
 # Parses the contest page.
 def parse_contest(contest):
     url = 'http://codeforces.com/contest/%s' % (contest)
-    html = urlopen(url).read()
+    req = Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'})
+    html = urlopen(req).read()
     parser = CodeforcesContestParser(contest)
     parser.feed(html.decode('utf-8'))
     return parser
