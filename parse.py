@@ -6,6 +6,7 @@ from subprocess import call
 from functools import partial, wraps
 
 import re
+import html
 import argparse
 import platform
 
@@ -61,15 +62,17 @@ class CodeforcesProblemParser(HTMLParser):
         self.num_tests = 0
         self.testcase = None
         self.start_copy = False
+        self.end_line = False
 
     def handle_starttag(self, tag, attrs):
         if tag == "div":
-            if attrs == [("class", "input")]:
+            attr_dict = dict(attrs)
+            if attr_dict.get("class") == "input":
                 self.num_tests += 1
                 self.testcase = open(
                     "%s/%s%d" % (self.folder, SAMPLE_INPUT, self.num_tests), "wb"
                 )
-            elif attrs == [("class", "output")]:
+            elif attr_dict.get("class") == "output":
                 self.testcase = open(
                     "%s/%s%d" % (self.folder, SAMPLE_OUTPUT, self.num_tests), "wb"
                 )
@@ -92,7 +95,7 @@ class CodeforcesProblemParser(HTMLParser):
 
     def handle_entityref(self, name):
         if self.start_copy:
-            self.testcase.write(self.unescape(("&%s;" % name)).encode("utf-8"))
+            self.testcase.write(html.unescape(("&%s;" % name)).encode("utf-8"))
 
     def handle_data(self, data):
         if self.start_copy:
