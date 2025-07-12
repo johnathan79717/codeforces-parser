@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 from html.parser import HTMLParser
 from sys import argv
 from subprocess import call
@@ -7,6 +7,7 @@ from functools import partial, wraps
 
 import re
 import html
+import time
 import argparse
 import platform
 
@@ -33,6 +34,10 @@ language_params = {
         "RUN_CMD": "java -jar out.jar $DBG",
     },
 }
+
+headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
 
 SAMPLE_INPUT = "input"
 SAMPLE_OUTPUT = "output"
@@ -150,21 +155,30 @@ class CodeforcesContestParser(HTMLParser):
 
 # Parses each problem page.
 def parse_problem(folder, contest, problem):
-    url = "http://codeforces.com/contest/%s/problem/%s" % (contest, problem)
-    html = urlopen(url).read()
-    parser = CodeforcesProblemParser(folder)
-    parser.feed(html.decode("utf-8"))
-    # .encode('utf-8') Should fix special chars problems?
-    return parser.num_tests
+    url = f"https://codeforces.com/contest/{contest}/problem/{problem}"
+    req = Request(url, headers=headers)
+    try:
+        html = urlopen(req).read()
+        parser = CodeforcesProblemParser(folder)
+        parser.feed(html.decode("utf-8"))
+        return parser.num_tests
+    except Exception as e:
+        print(f"Error parsing problem {problem}: {e}")
+        return 0
 
 
 # Parses the contest page.
 def parse_contest(contest):
-    url = "http://codeforces.com/contest/%s" % (contest)
-    html = urlopen(url).read()
-    parser = CodeforcesContestParser(contest)
-    parser.feed(html.decode("utf-8"))
-    return parser
+    url = f"https://codeforces.com/contest/{contest}"
+    req = Request(url, headers=headers)
+    try:
+        html = urlopen(req).read()
+        parser = CodeforcesContestParser(contest)
+        parser.feed(html.decode("utf-8"))
+        return parser
+    except Exception as e:
+        print(f"Error parsing contest {contest}: {e}")
+        return None
 
 
 # Generates the test script.
@@ -255,8 +269,11 @@ def main():
     language = args.language
 
     # Find contest and problems.
-    print("Parsing contest %s for language %s, please wait..." % (contest, language))
+    print(f"Parsing contest {contest} for language {language}, please wait...")
     content = parse_contest(contest)
+    if content is None:
+        print("Failed to parse contest. Check if the contest number is correct.")
+        return
     print(BOLD + GREEN_F + "*** Round name: " + content.name + " ***" + NORM)
     print("Found %d problems!" % (len(content.problems)))
 
@@ -276,8 +293,11 @@ def main():
         )
         num_tests = parse_problem(folder, contest, problem)
         print("%d sample test(s) found." % num_tests)
-        generate_test_script(folder, language, num_tests, problem)
+        if num_tests > 0:
+            generate_test_script(folder, language, num_tests, problem)
         print("========================================")
+        # small delay to avoid rate-limiting
+        time.sleep(1)
 
     print("Use ./test.sh to run sample tests in each directory.")
 
