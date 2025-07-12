@@ -1,26 +1,23 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 )
 
 var DEBUG = "N"
-var DEBUG_BOOL = false
 
 func debug(args ...interface{}) {
-	if DEBUG_BOOL {
+	if DEBUG != "N" {
+		fmt.Fprint(os.Stderr, "DEBUG: ")
 		fmt.Fprintln(os.Stderr, args...)
 	}
 }
 
 func main() {
-	if DEBUG != "N" {
-		DEBUG_BOOL = true
-	}
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	// code goes here
 
-	var N int
-	fmt.Scan(&N)
-
-	debug(N)
 }
