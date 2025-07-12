@@ -47,10 +47,10 @@ GREEN_F = "\033[32m"
 BOLD = "\033[1m"
 NORM = "\033[0m"
 if platform.system() == "Darwin":
-    TIME_CMD = '`which gtime` -o time.out -f "(%es)"'
+    TIME_CMD = r'`which gtime` -o time.out -f "(%es)"'
 else:
-    TIME_CMD = '`which time` -o time.out -f "(%es)"'
-TIME_AP = "`cat time.out`"
+    TIME_CMD = r'`which time` -o time.out -f "(%es)"'
+TIME_AP = r"`cat time.out`"
 
 
 # Problems parser.
@@ -182,7 +182,7 @@ def generate_test_script(folder, language, num_tests, problem):
                 '      echo "-d was selected; compiling in DEBUG mode!" >&2\n'
                 "      DBG=" + param["DEBUG_FLAGS"] + "\n"
                 "      ;;\n"
-                "    \?)\n"
+                r"    \?)" + "\n"
                 '      echo "Invalid option: -$OPTARG" >&2\n'
                 "      ;;\n"
                 "  esac\n"
@@ -203,23 +203,23 @@ def generate_test_script(folder, language, num_tests, problem):
             "    i=$((${{#INPUT_NAME}}))\n"
             "    test_case=${{test_file:$i}}\n"
             "    if ! {5} {run_cmd} < $INPUT_NAME$test_case > $MY_NAME$test_case; then\n"
-            "        echo {1}{4}Sample test \#$test_case: Runtime Error{2} {6}\n"
+            r"        echo {1}{4}Sample test \#$test_case: Runtime Error{2} {6}" + "\n"
             "        echo ========================================\n"
-            "        echo Sample Input \#$test_case\n"
+            r"        echo Sample Input \#$test_case" + "\n"
             "        cat $INPUT_NAME$test_case\n"
             "    else\n"
             "        if diff --brief --ignore-space-change --ignore-blank-lines $MY_NAME$test_case $OUTPUT_NAME$test_case; then\n"
-            "            echo {1}{3}Sample test \#$test_case: Accepted{2} {6}\n"
+            r"            echo {1}{3}Sample test \#$test_case: Accepted{2} {6}" + "\n"
             "        else\n"
-            "            echo {1}{4}Sample test \#$test_case: Wrong Answer{2} {6}\n"
+            r"            echo {1}{4}Sample test \#$test_case: Wrong Answer{2} {6}" + "\n"
             "            echo ========================================\n"
-            "            echo Sample Input \#$test_case\n"
+            r"            echo Sample Input \#$test_case" + "\n"
             "            cat $INPUT_NAME$test_case\n"
             "            echo ========================================\n"
-            "            echo Sample Output \#$test_case\n"
+            r"            echo Sample Output \#$test_case" + "\n"
             "            cat $OUTPUT_NAME$test_case\n"
             "            echo ========================================\n"
-            "            echo My Output \#$test_case\n"
+            r"            echo My Output \#$test_case" + "\n"
             "            cat $MY_NAME$test_case\n"
             "            echo ========================================\n"
             "        fi\n"
