@@ -15,6 +15,12 @@ import platform
 # User modifiable constants
 ###########################
 language_params = {
+    "c++17": {
+        "TEMPLATE": "main.cc",
+        "DEBUG_FLAGS": "-DDEBUG",
+        "COMPILE_CMD": "g++ -g -std=c++17 -Wall $DBG",
+        "RUN_CMD": "./a.out",
+    },
     "c++14": {
         "TEMPLATE": "main.cc",
         "DEBUG_FLAGS": "-DDEBUG",
@@ -259,7 +265,7 @@ def main():
     parser.add_argument(
         "--language",
         "-l",
-        default="c++14",
+        default="c++17",
         help="The programming language you want to use " "(c++14, go)",
     )
     parser.add_argument("contest", help="")
