@@ -241,44 +241,49 @@ def generate_test_script(folder, language, num_tests, problem):
                 "rm -R $MY_NAME* &>/dev/null\n"
             ).format(problem, param["TEMPLATE"].split(".")[1])
         )
-        test.write(
+        
+        # Fixed: Use INPUT_NAME instead of the literal string
+        script_content = (
             "for test_file in $INPUT_NAME*\n"
             "do\n"
-            "    i=$((${{#INPUT_NAME}}))\n"
+            "    i=${{#INPUT_NAME}}\n"  # Fixed: Use INPUT_NAME variable
             "    test_case=${{test_file:$i}}\n"
-            "    if ! {5} {run_cmd} < $INPUT_NAME$test_case > $MY_NAME$test_case; then\n"
-            r"        echo {1}{4}Sample test \#$test_case: Runtime Error{2} {6}" + "\n"
+            "    if ! {1} {3} < $INPUT_NAME$test_case > $MY_NAME$test_case; then\n"
+            '        echo "{4}{5}Sample test #$test_case: Runtime Error{6} {2}"\n'
             "        echo ========================================\n"
-            r"        echo Sample Input \#$test_case" + "\n"
+            '        echo "Sample Input #$test_case"\n'
             "        cat $INPUT_NAME$test_case\n"
             "    else\n"
             "        if diff --brief --ignore-space-change --ignore-blank-lines $MY_NAME$test_case $OUTPUT_NAME$test_case; then\n"
-            r"            echo {1}{3}Sample test \#$test_case: Accepted{2} {6}" + "\n"
+            '            echo "{4}{7}Sample test #$test_case: Accepted{6} {2}"\n'
             "        else\n"
-            r"            echo {1}{4}Sample test \#$test_case: Wrong Answer{2} {6}" + "\n"
+            '            echo "{4}{5}Sample test #$test_case: Wrong Answer{6} {2}"\n'
             "            echo ========================================\n"
-            r"            echo Sample Input \#$test_case" + "\n"
+            '            echo "Sample Input #$test_case"\n'
             "            cat $INPUT_NAME$test_case\n"
             "            echo ========================================\n"
-            r"            echo Sample Output \#$test_case" + "\n"
+            '            echo "Sample Output #$test_case"\n'
             "            cat $OUTPUT_NAME$test_case\n"
             "            echo ========================================\n"
-            r"            echo My Output \#$test_case" + "\n"
+            '            echo "My Output #$test_case"\n'
             "            cat $MY_NAME$test_case\n"
             "            echo ========================================\n"
             "        fi\n"
             "    fi\n"
-            "done\n".format(
-                num_tests,
-                BOLD,
-                NORM,
-                GREEN_F,
-                RED_F,
-                TIME_CMD,
-                TIME_AP,
-                run_cmd=param["RUN_CMD"],
-            )
+            "done\n"
+        ).format(
+            SAMPLE_INPUT,      # {0} - Not used in this part
+            TIME_CMD,          # {1}
+            TIME_AP,           # {2}
+            param["RUN_CMD"],  # {3}
+            BOLD,              # {4}
+            RED_F,             # {5}
+            NORM,              # {6}
+            GREEN_F,           # {7}
         )
+        
+        test.write(script_content)
+        
     call(["chmod", "+x", folder + "test.sh"])
 
 
