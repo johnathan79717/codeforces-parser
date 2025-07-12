@@ -4,12 +4,15 @@ from html.parser import HTMLParser
 from sys import argv
 from subprocess import call
 from functools import partial, wraps
+import os
+from pathlib import Path
 
 import re
 import html
 import time
 import argparse
 import platform
+import logging
 
 ###########################
 # User modifiable constants
@@ -80,15 +83,19 @@ class CodeforcesProblemParser(HTMLParser):
             attr_dict = dict(attrs)
             if attr_dict.get("class") == "input":
                 self.num_tests += 1
+                if self.testcase:
+                    self.testcase.close()
                 self.testcase = open(
-                    "%s/%s%d" % (self.folder, SAMPLE_INPUT, self.num_tests), "wb"
+                    f"{self.folder}/{SAMPLE_INPUT}{self.num_tests}", "wb"
                 )
             elif attr_dict.get("class") == "output":
+                if self.testcase:
+                    self.testcase.close()
                 self.testcase = open(
-                    "%s/%s%d" % (self.folder, SAMPLE_OUTPUT, self.num_tests), "wb"
+                    f"{self.folder}/{SAMPLE_OUTPUT}{self.num_tests}", "wb"
                 )
         elif tag == "pre":
-            if self.testcase != None:
+            if self.testcase is not None:
                 self.start_copy = True
 
     def handle_endtag(self, tag):
@@ -113,6 +120,10 @@ class CodeforcesProblemParser(HTMLParser):
             self.testcase.write(data.strip("\n").encode("utf-8"))
             self.end_line = False
 
+    def __del__(self):
+        if self.testcase:
+            self.testcase.close()
+
 
 # Contest parser.
 class CodeforcesContestParser(HTMLParser):
@@ -128,21 +139,20 @@ class CodeforcesContestParser(HTMLParser):
         self.problem_names = []
 
     def handle_starttag(self, tag, attrs):
-        if self.name == "" and attrs == [
-            ("style", "color: black"),
-            ("href", "/contest/%s" % (self.contest)),
-        ]:
+        attr_dict = dict(attrs)
+        
+        # More robust contest name detection
+        if (tag == "a" and 
+            self.name == "" and 
+            attr_dict.get("href") == f"/contest/{self.contest}"):
             self.start_contest = True
+            
         elif tag == "option":
-            if len(attrs) == 1:
-                regexp = re.compile(
-                    r"'[A-Z][0-9]?'"
-                )  # The attrs will be something like: ('value', 'X'), or ('value', 'X1')
-                string = str(attrs[0])
-                search = regexp.search(string)
-                if search is not None:
-                    self.problems.append(search.group(0).split("'")[-2])
-                    self.start_problem = True
+            value = attr_dict.get("value", "")
+            # Look for problem identifiers (A, B, C, etc.)
+            if re.match(r'^[A-Z][0-9]?$', value):
+                self.problems.append(value)
+                self.start_problem = True
 
     def handle_endtag(self, tag):
         if tag == "a" and self.start_contest:
@@ -164,12 +174,14 @@ def parse_problem(folder, contest, problem):
     url = f"https://codeforces.com/contest/{contest}/problem/{problem}"
     req = Request(url, headers=headers)
     try:
-        html = urlopen(req).read()
+        with urlopen(req, timeout=10) as response:
+            html = response.read()
         parser = CodeforcesProblemParser(folder)
         parser.feed(html.decode("utf-8"))
+        logger.info(f"Successfully parsed problem {problem}")
         return parser.num_tests
     except Exception as e:
-        print(f"Error parsing problem {problem}: {e}")
+        logger.error(f"Error parsing problem {problem}: {e}")
         return 0
 
 
@@ -258,21 +270,26 @@ def generate_test_script(folder, language, num_tests, problem):
     call(["chmod", "+x", folder + "test.sh"])
 
 
-# Main function.
 def main():
     print(VERSION)
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Parse Codeforces contest problems")
     parser.add_argument(
         "--language",
         "-l",
         default="c++17",
-        help="The programming language you want to use " "(c++14, go)",
+        choices=list(language_params.keys()),
+        help="The programming language you want to use"
     )
-    parser.add_argument("contest", help="")
+    parser.add_argument("contest", help="Contest number", type=int)
     args = parser.parse_args()
 
     contest = args.contest
     language = args.language
+
+    # Validate contest number
+    if contest <= 0:
+        print("Contest number must be positive")
+        return
 
     # Find contest and problems.
     print(f"Parsing contest {contest} for language {language}, please wait...")
@@ -280,33 +297,45 @@ def main():
     if content is None:
         print("Failed to parse contest. Check if the contest number is correct.")
         return
-    print(BOLD + GREEN_F + "*** Round name: " + content.name + " ***" + NORM)
-    print("Found %d problems!" % (len(content.problems)))
+    
+    if not content.problems:
+        print("No problems found in this contest.")
+        return
+        
+    print(f"{BOLD}{GREEN_F}*** Round name: {content.name} ***{NORM}")
+    print(f"Found {len(content.problems)} problems!")
 
     # Find problems and test cases.
     TEMPLATE = language_params[language]["TEMPLATE"]
     for index, problem in enumerate(content.problems):
-        print("Downloading Problem %s: %s..." % (problem, content.problem_names[index]))
-        folder = "%s-%s/%s/" % (contest, language, problem)
-        call(["mkdir", "-p", folder])
-        call(
-            [
-                "cp",
-                "-n",
-                TEMPLATE,
-                "%s/%s.%s" % (folder, problem, TEMPLATE.split(".")[1]),
-            ]
-        )
-        num_tests = parse_problem(folder, contest, problem)
-        print("%d sample test(s) found." % num_tests)
+        problem_name = content.problem_names[index] if index < len(content.problem_names) else "Unknown"
+        print(f"Downloading Problem {problem}: {problem_name}...")
+        
+        folder = Path(f"{contest}-{language}") / problem
+        folder.mkdir(parents=True, exist_ok=True)
+        
+        template_src = Path(TEMPLATE)
+        template_dst = folder / f"{problem}.{TEMPLATE.split('.')[1]}"
+        
+        if template_src.exists() and not template_dst.exists():
+            import shutil
+            shutil.copy2(template_src, template_dst)
+        
+        num_tests = parse_problem(str(folder) + "/", contest, problem)
+        print(f"{num_tests} sample test(s) found.")
+        
         if num_tests > 0:
-            generate_test_script(folder, language, num_tests, problem)
-        print("========================================")
-        # small delay to avoid rate-limiting
+            generate_test_script(str(folder) + "/", language, num_tests, problem)
+        print("=" * 40)
         time.sleep(1)
 
     print("Use ./test.sh to run sample tests in each directory.")
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+    logger = logging.getLogger(__name__)
     main()
