@@ -42,6 +42,18 @@ language_params = {
         "DEBUG_FLAGS": "-d",
         "RUN_CMD": "java -jar out.jar $DBG",
     },
+    "java": {
+        "TEMPLATE": "Main.java",
+        "DEBUG_FLAGS": "-DDEBUG=true",
+        "COMPILE_CMD": "javac $DBG",
+        "RUN_CMD": "java -DDEBUG=$DBG Main",
+    },
+    "rust": {
+        "TEMPLATE": "main.rs",
+        "DEBUG_FLAGS": "--cfg debug_assertions",
+        "COMPILE_CMD": "rustc $DBG -o a.out",
+        "RUN_CMD": "./a.out",
+    },
 }
 
 headers = {
