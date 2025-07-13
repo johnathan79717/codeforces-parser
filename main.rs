@@ -9,10 +9,9 @@ macro_rules! debug {
 }
 
 fn main() {
-  let stdin = io::stdin();
-  let mut lines = stdin.lock().lines();
-  // code goes here ...
-
+    let stdin = io::stdin();
+    let mut lines = stdin.lock().lines();
+    // code goes here ...
 }
 
 #[allow(dead_code)]
@@ -24,9 +23,9 @@ fn read_line() -> String {
 }
 
 #[allow(dead_code)]
-fn read_nums<T: std::str::FromStr>() -> Vec<T> 
-where 
-    T::Err: std::fmt::Debug 
+fn read_nums<T: std::str::FromStr>() -> Vec<T>
+where
+    T::Err: std::fmt::Debug,
 {
     read_line()
         .split_whitespace()
